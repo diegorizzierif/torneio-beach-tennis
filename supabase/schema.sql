@@ -3,8 +3,6 @@
 -- Quem lê: qualquer pessoa com o link (sem login).
 -- Quem altera: só o organizador que criou o torneio (logado no Supabase Auth).
 
-create extension if not exists pgcrypto;
-
 -- ============ TORNEIOS ============
 create table public.torneios (
   id               uuid primary key default gen_random_uuid(),
@@ -17,7 +15,7 @@ create table public.torneios (
   status           text not null default 'inscricoes'
                    check (status in ('inscricoes', 'em_andamento', 'encerrado')),
   -- código curto usado no link público, ex.: /t/3fa92c1b
-  codigo           text not null unique default encode(gen_random_bytes(4), 'hex'),
+  codigo           text not null unique default substr(replace(gen_random_uuid()::text, '-', ''), 1, 8),
   criado_em        timestamptz not null default now()
 );
 
@@ -143,3 +141,8 @@ create policy "organizador escreve" on public.jogos
 -- ============ TEMPO REAL ============
 -- Faz o app receber na hora qualquer placar ou mudança de participante.
 alter publication supabase_realtime add table public.torneios, public.participantes, public.jogos;
+
+-- ============ PERMISSÕES DA API ============
+-- (o RLS acima é quem decide linha a linha; isto só libera o acesso às tabelas)
+grant select on public.torneios, public.participantes, public.jogos, public.ranking to anon, authenticated;
+grant insert, update, delete on public.torneios, public.participantes, public.jogos to authenticated;
