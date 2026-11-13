@@ -312,6 +312,9 @@ input:focus { outline: none; border-color: var(--mar); background: var(--card); 
 .placar-x { color: var(--muted); font-weight: 700; }
 .placar .btn { margin-left: auto; }
 
+.zona-perigo { display: flex; justify-content: center; margin-top: 18px; }
+.zona-perigo .confirmar { width: 100%; border: 2px solid var(--erro); }
+.zona-perigo .confirmar .linha .btn { flex: 1; }
 .acoes { display: flex; gap: 10px; justify-content: stretch; margin-top: 6px; }
 .acoes .btn { flex: 1; }
 
