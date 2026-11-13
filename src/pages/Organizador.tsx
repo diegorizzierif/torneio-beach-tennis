@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import type { Session } from '@supabase/supabase-js';
 import { ListaJogos, Ranking } from '../components';
 import { placarValido } from '../lib/ranking';
@@ -193,6 +193,8 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
   const [ocupado, setOcupado] = useState(false);
   const [aba, setAba] = useState<'jogos' | 'ranking'>('jogos');
   const [copiado, setCopiado] = useState(false);
+  const [confirmarApagar, setConfirmarApagar] = useState(false);
+  const navegar = useNavigate();
 
   const voltar = (
     <Link to="/" className="icone-btn" aria-label="Voltar">
@@ -266,6 +268,15 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
     await supabase.from('torneios').update({ status: 'inscricoes' }).eq('id', t.id);
     setOcupado(false);
     await recarregar();
+  }
+
+  async function apagarTorneio() {
+    setOcupado(true);
+    // participantes e jogos são apagados junto (on delete cascade); jogadores salvos continuam
+    const { error } = await supabase.from('torneios').delete().eq('id', t.id);
+    setOcupado(false);
+    if (error) return setMsg(error.message);
+    navegar('/', { replace: true });
   }
 
   async function copiar() {
@@ -379,6 +390,29 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
           </section>
         </>
       )}
+
+      <section className="zona-perigo">
+        {confirmarApagar ? (
+          <div className="cartao pilha confirmar">
+            <b>Apagar “{t.nome}”?</b>
+            <p className="sub">
+              Isso apaga {jogos.length > 0 ? `os ${jogos.length} jogos, os placares e ` : ''}a lista de quem jogou e não pode ser desfeito. Os jogadores salvos na aba Jogadores continuam.
+            </p>
+            <div className="linha">
+              <button className="btn" onClick={() => setConfirmarApagar(false)} disabled={ocupado}>
+                Cancelar
+              </button>
+              <button className="btn perigo" onClick={apagarTorneio} disabled={ocupado}>
+                <Icone nome="lixo" tam={18} /> Apagar de vez
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button className="btn fantasma perigo-txt" onClick={() => setConfirmarApagar(true)}>
+            <Icone nome="lixo" tam={18} /> Apagar torneio
+          </button>
+        )}
+      </section>
     </Moldura>
   );
 }
