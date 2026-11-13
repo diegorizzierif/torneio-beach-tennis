@@ -13,6 +13,28 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Se algo der errado antes do app desenhar a tela, mostra o motivo em vez de uma tela branca.
+      (function () {
+        function mostrar(msg) {
+          var r = document.getElementById('root');
+          if (!r || r.childNodes.length) return;
+          r.innerHTML =
+            '<div style="font-family:system-ui,sans-serif;padding:24px;line-height:1.4">' +
+            '<h2 style="margin:0 0 8px">Não foi possível abrir o app</h2>' +
+            '<p style="margin:0 0 12px">Tente recarregar a página. Se continuar, mande um print desta tela.</p>' +
+            '<pre style="white-space:pre-wrap;font-size:12px;background:#f2f2f2;padding:12px;border-radius:8px"></pre></div>';
+          r.querySelector('pre').textContent = msg + '\n' + navigator.userAgent;
+        }
+        window.addEventListener('error', function (e) {
+          mostrar('Erro: ' + (e.message || (e.target && (e.target.src || e.target.href)) || 'desconhecido'));
+        }, true);
+        window.addEventListener('unhandledrejection', function (e) {
+          mostrar('Erro: ' + (e.reason && (e.reason.message || e.reason)));
+        });
+        setTimeout(function () { mostrar('O app não carregou em 10 segundos.'); }, 10000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
