@@ -27,7 +27,7 @@ function Entrar() {
     const r =
       modo === 'entrar'
         ? await supabase.auth.signInWithPassword({ email, password: senha })
-        : await supabase.auth.signUp({ email, password: senha });
+        : await supabase.auth.signUp({ email, password: senha, options: { emailRedirectTo: window.location.origin } });
     setEnviando(false);
     if (r.error) setMsg(r.error.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : r.error.message);
     else if (modo === 'criar' && !r.data.session) setMsg('Conta criada. Confirme pelo link enviado ao seu e-mail e depois entre.');
