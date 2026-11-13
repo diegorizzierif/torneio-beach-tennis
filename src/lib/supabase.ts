@@ -27,6 +27,13 @@ export interface Participante {
   torneio_id: string;
   nome: string;
   sexo: Sexo;
+  jogador_id: string | null;
+}
+export interface Jogador {
+  id: string;
+  organizador_id: string;
+  nome: string;
+  sexo: Sexo;
 }
 export interface Jogo {
   id: string;
