@@ -19,16 +19,29 @@ create table public.torneios (
   criado_em        timestamptz not null default now()
 );
 
+-- ============ JOGADORES (cadastro permanente do organizador) ============
+create table public.jogadores (
+  id              uuid primary key default gen_random_uuid(),
+  organizador_id  uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  nome            text not null check (length(trim(nome)) > 0),
+  sexo            char(1) not null check (sexo in ('M', 'F')),
+  criado_em       timestamptz not null default now(),
+  unique (organizador_id, nome)
+);
+create index on public.jogadores (organizador_id);
+
 -- ============ PARTICIPANTES ============
 create table public.participantes (
   id          uuid primary key default gen_random_uuid(),
   torneio_id  uuid not null references public.torneios(id) on delete cascade,
   nome        text not null check (length(trim(nome)) > 0),
   sexo        char(1) not null check (sexo in ('M', 'F')),
+  jogador_id  uuid references public.jogadores(id) on delete set null,
   criado_em   timestamptz not null default now(),
   unique (torneio_id, nome)
 );
 create index on public.participantes (torneio_id);
+create index on public.participantes (jogador_id);
 
 -- ============ JOGOS ============
 -- Dupla A = a1 + a2, dupla B = b1 + b2. "ordem" é a posição na fila;
@@ -114,6 +127,11 @@ group by p.torneio_id, p.id, p.nome, p.sexo;
 alter table public.torneios      enable row level security;
 alter table public.participantes enable row level security;
 alter table public.jogos         enable row level security;
+alter table public.jogadores     enable row level security;
+
+-- Jogadores salvos: privados do organizador
+create policy "organizador gerencia seus jogadores" on public.jogadores
+  for all to authenticated using (organizador_id = auth.uid()) with check (organizador_id = auth.uid());
 
 -- Leitura pública (o link do torneio funciona sem login)
 create policy "leitura publica" on public.torneios      for select using (true);
@@ -146,3 +164,4 @@ alter publication supabase_realtime add table public.torneios, public.participan
 -- (o RLS acima é quem decide linha a linha; isto só libera o acesso às tabelas)
 grant select on public.torneios, public.participantes, public.jogos, public.ranking to anon, authenticated;
 grant insert, update, delete on public.torneios, public.participantes, public.jogos to authenticated;
+grant select, insert, update, delete on public.jogadores to authenticated;
