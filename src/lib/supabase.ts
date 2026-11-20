@@ -19,6 +19,7 @@ export interface Torneio {
   jogos_por_pessoa: number;
   games_por_set: 4 | 6;
   quadras: 1 | 2;
+  todos_contra_todos: boolean;
   status: Status;
   codigo: string;
 }

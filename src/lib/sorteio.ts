@@ -16,6 +16,8 @@ export interface ResultadoSorteio {
   jogos: JogoSorteado[];
   parceirosRepetidos: number;
   maxSeguidos: number;
+  /** Pares de jogadores que nunca jogaram um contra o outro. */
+  naoSeEnfrentaram: number;
 }
 
 /** Quantidades de jogos por pessoa que o organizador pode escolher. */
@@ -35,6 +37,30 @@ export function motivoJogosInvalido(n: number, k: number): string | null {
 /** Quantidades de jogos por pessoa (entre 4, 6, 8 e 10) que fecham a conta para esse grupo. */
 export function opcoesJogosPorPessoa(jogadores: Jogador[]): number[] {
   return JOGOS_POR_PESSOA.filter((k) => motivoJogosInvalido(jogadores.length, k) === null);
+}
+
+/**
+ * Menor número de jogos por pessoa com que dá, em tese, para todo mundo enfrentar
+ * todo mundo pelo menos uma vez, respeitando a regra das mistas.
+ * - Cada jogo coloca a pessoa contra 2 adversários: k >= (n - 1) / 2.
+ * - Uma mulher só enfrenta homens em jogos mistos, e cada misto tem só 1 homem do
+ *   outro lado: ela precisa de pelo menos um jogo por homem (k >= homens).
+ *   O mesmo vale para os homens em relação às mulheres (k >= mulheres).
+ */
+export function minimoTodosContraTodos(jogadores: Jogador[]): number {
+  const n = jogadores.length;
+  const w = jogadores.filter((j) => j.sexo === 'F').length;
+  const base = Math.ceil((n - 1) / 2);
+  if (Math.min(w, n - w) <= 1) return base;
+  return Math.max(base, w, n - w);
+}
+
+/** Motivo para k jogos não bastarem para todos se enfrentarem, ou null se bastam. */
+export function motivoTodosContraTodos(jogadores: Jogador[], k: number): string | null {
+  if (jogadores.length < 4) return null;
+  const min = minimoTodosContraTodos(jogadores);
+  if (k >= min) return null;
+  return `Para todo mundo enfrentar todo mundo com ${jogadores.length} jogadores, cada um precisa de pelo menos ${min} jogos.`;
 }
 
 /** Gerador pseudoaleatório com semente (mulberry32), para o sorteio ser reproduzível. */
@@ -65,6 +91,8 @@ export interface OpcoesSorteio {
   semente?: number;
   /** Tempo máximo de busca em ms. */
   tempoMs?: number;
+  /** Prioriza que todo mundo enfrente todo mundo pelo menos uma vez. */
+  todosContraTodos?: boolean;
 }
 
 /**
@@ -94,6 +122,9 @@ export function sortear(jogadores: Jogador[], op: OpcoesSorteio): ResultadoSorte
 
   while (tentativas < 20 || (Date.now() < fim && tentativas < 5000)) {
     tentativas++;
+    // Alterna o peso de "ainda não se enfrentaram": com peso maior todos se
+    // enfrentam mais fácil, com peso menor repetem menos parceiros. Fica a melhor.
+    const bonusNovo = [40, 120, 300][tentativas % 3];
     const restam = new Map(ids.map((id) => [id, k]));
     const parceiros = new Map<string, number>();
     const adversarios = new Map<string, number>();
@@ -148,7 +179,13 @@ export function sortear(jogadores: Jogador[], op: OpcoesSorteio): ResultadoSorte
           for (const [p1, p2] of splits) {
             if (!valido(p1, p2)) continue;
             let s = 100 * ((parceiros.get(parKey(...p1)) ?? 0) + (parceiros.get(parKey(...p2)) ?? 0));
-            for (const x of p1) for (const y of p2) s += 3 * (adversarios.get(parKey(x, y)) ?? 0);
+            for (const x of p1)
+              for (const y of p2) {
+                const vezes = adversarios.get(parKey(x, y)) ?? 0;
+                s += 3 * vezes;
+                // Bônus para quem ainda não se enfrentou.
+                if (op.todosContraTodos && vezes === 0) s -= bonusNovo;
+              }
             for (const x of [a, b, c, d]) {
               if (seguidos.get(x)! >= 2) s += 20;
               s -= 2 * restam.get(x)!;
@@ -189,6 +226,7 @@ export function sortear(jogadores: Jogador[], op: OpcoesSorteio): ResultadoSorte
 
     const res = avaliar(jogos, ids);
     const score = [res.parceirosRepetidos, jogos[jogos.length - 1].rodada, res.maxSeguidos];
+    if (op.todosContraTodos) score.unshift(res.naoSeEnfrentaram);
     if (!melhor || menor(score, melhor.score)) melhor = { score, res };
     if (Date.now() >= fim && tentativas >= 20) break;
   }
@@ -215,5 +253,8 @@ export function avaliar(jogos: JogoSorteado[], ids: string[]): ResultadoSorteio 
       maxSeguidos = Math.max(maxSeguidos, seg.get(id)!);
     }
   }
-  return { jogos, parceirosRepetidos, maxSeguidos };
+  const enfrentaram = new Set<string>();
+  for (const j of jogos) for (const x of j.a) for (const y of j.b) enfrentaram.add(parKey(x, y));
+  const naoSeEnfrentaram = (ids.length * (ids.length - 1)) / 2 - enfrentaram.size;
+  return { jogos, parceirosRepetidos, maxSeguidos, naoSeEnfrentaram };
 }

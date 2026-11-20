@@ -12,6 +12,8 @@ create table public.torneios (
   jogos_por_pessoa int  not null default 4 check (jogos_por_pessoa between 1 and 10),
   games_por_set    int  not null default 6 check (games_por_set in (4, 6)),
   quadras          int  not null default 1 check (quadras in (1, 2)),
+  -- sorteio prioriza que todo mundo enfrente todo mundo pelo menos uma vez
+  todos_contra_todos boolean not null default false,
   status           text not null default 'inscricoes'
                    check (status in ('inscricoes', 'em_andamento', 'encerrado')),
   -- código curto usado no link público, ex.: /t/3fa92c1b
