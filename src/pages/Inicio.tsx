@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, type Torneio } from "../lib/supabase";
-import { dataBR, Icone, Moldura } from "../ui";
+import { JOGOS_POR_PESSOA, motivoJogosInvalido } from "../lib/sorteio";
+import { dataBR, Icone, Moldura, Segmentos } from "../ui";
 import { useJogadores } from "./Jogadores";
 
 export function useSessao() {
@@ -134,6 +135,8 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
   const [criando, setCriando] = useState(false);
   const [marcados, setMarcados] = useState<Set<string>>(new Set());
   const [busca, setBusca] = useState("");
+  const [jogosPorPessoa, setJogosPorPessoa] = useState<number>(4);
+  const [gamesPorSet, setGamesPorSet] = useState<4 | 6>(6);
   const { jogadores } = useJogadores(sessao.user.id);
   const navegar = useNavigate();
 
@@ -168,7 +171,11 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
     setCriando(true);
     const { data, error } = await supabase
       .from("torneios")
-      .insert({ nome: nome.trim() })
+      .insert({
+        nome: nome.trim(),
+        jogos_por_pessoa: jogosPorPessoa,
+        games_por_set: gamesPorSet,
+      })
       .select()
       .single();
     if (error) {
@@ -204,6 +211,34 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
             onChange={(e) => setNome(e.target.value)}
           />
         </label>
+        <div className="campo">
+          <span>Jogos por pessoa</span>
+          <Segmentos
+            rotulo="Jogos por pessoa"
+            valor={jogosPorPessoa}
+            aoMudar={setJogosPorPessoa}
+            opcoes={JOGOS_POR_PESSOA.map((k) => [k, String(k)] as const)}
+          />
+          {escolhidos.length >= 4 &&
+            motivoJogosInvalido(escolhidos.length, jogosPorPessoa) && (
+              <p className="sub">
+                {motivoJogosInvalido(escolhidos.length, jogosPorPessoa)} Dá
+                para ajustar depois, antes do sorteio.
+              </p>
+            )}
+        </div>
+        <div className="campo">
+          <span>Set até</span>
+          <Segmentos
+            rotulo="Set até"
+            valor={gamesPorSet}
+            aoMudar={setGamesPorSet}
+            opcoes={[
+              [4, "4 games"],
+              [6, "6 games"],
+            ]}
+          />
+        </div>
         {jogadores && jogadores.length > 0 && (
           <div className="campo">
             <div className="titulo-secao">

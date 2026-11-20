@@ -3,7 +3,13 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { ListaJogos, Ranking } from "../components";
 import { placarValido } from "../lib/ranking";
-import { opcoesJogosPorPessoa, sortear, type Sexo } from "../lib/sorteio";
+import {
+  JOGOS_POR_PESSOA,
+  motivoJogosInvalido,
+  opcoesJogosPorPessoa,
+  sortear,
+  type Sexo,
+} from "../lib/sorteio";
 import {
   supabase,
   useTorneio,
@@ -371,7 +377,8 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
   async function gerar() {
     if (!opcoes.includes(t.jogos_por_pessoa))
       return setMsg(
-        "Escolha uma quantidade de jogos por pessoa válida para este grupo.",
+        motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
+          "Escolha 4, 6, 8 ou 10 jogos por pessoa.",
       );
     setOcupado(true);
     setMsg(null);
@@ -499,17 +506,18 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
             <h2>Formato</h2>
             <div className="campo">
               <span>Jogos por pessoa</span>
-              {opcoes.length === 0 ? (
+              <Segmentos
+                rotulo="Jogos por pessoa"
+                valor={t.jogos_por_pessoa}
+                aoMudar={(k) => alterar({ jogos_por_pessoa: k })}
+                opcoes={JOGOS_POR_PESSOA.map((k) => [k, String(k)] as const)}
+                desativados={JOGOS_POR_PESSOA.filter((k) => !opcoes.includes(k))}
+              />
+              {!opcoes.includes(t.jogos_por_pessoa) && (
                 <p className="sub">
-                  Inclua pelo menos 4 jogadores para ver as opções.
+                  {motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
+                    "Escolha 4, 6, 8 ou 10 jogos por pessoa."}
                 </p>
-              ) : (
-                <Segmentos
-                  rotulo="Jogos por pessoa"
-                  valor={t.jogos_por_pessoa}
-                  aoMudar={(k) => alterar({ jogos_por_pessoa: k })}
-                  opcoes={opcoes.map((k) => [k, String(k)] as const)}
-                />
               )}
             </div>
             <div className="campo">

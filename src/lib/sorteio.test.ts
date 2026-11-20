@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { opcoesJogosPorPessoa, sortear, type Jogador } from './sorteio';
+import { motivoJogosInvalido, opcoesJogosPorPessoa, sortear, type Jogador } from './sorteio';
 import { calcularRanking, placarValido } from './ranking';
 
 function grupo(homens: number, mulheres: number): Jogador[] {
@@ -45,7 +45,14 @@ describe('sorteio', () => {
         const js = grupo(n - w, w);
         for (const k of opcoesJogosPorPessoa(js)) conferir(js, k, 1);
       }
-  }, 120_000);
+  }, 300_000);
+
+  it('3 mulheres com 2 quadras e 8 ou 10 jogos não trava', () => {
+    conferir(grupo(6, 3), 8, 2);
+    conferir(grupo(6, 3), 4, 2);
+    conferir(grupo(7, 3), 10, 2);
+    conferir(grupo(7, 3), 8, 2);
+  }, 60_000);
 
   it('funciona com 2 quadras para 10 a 14 jogadores, 4 jogos', () => {
     for (let n = 10; n <= 14; n++)
@@ -55,11 +62,14 @@ describe('sorteio', () => {
       }
   }, 120_000);
 
-  it('opções de jogos por pessoa', () => {
-    expect(opcoesJogosPorPessoa(grupo(4, 4))).toEqual([2, 3, 4, 5, 6]);
-    expect(opcoesJogosPorPessoa(grupo(5, 3))).toEqual([2, 4, 6]);
-    expect(opcoesJogosPorPessoa(grupo(7, 7))).toEqual([2, 4, 6]);
-    expect(opcoesJogosPorPessoa(grupo(6, 3))).toEqual([4]);
+  it('opções de jogos por pessoa: 4, 6, 8 e 10', () => {
+    expect(opcoesJogosPorPessoa(grupo(4, 4))).toEqual([4, 6, 8, 10]);
+    expect(opcoesJogosPorPessoa(grupo(5, 3))).toEqual([4, 6, 8, 10]);
+    expect(opcoesJogosPorPessoa(grupo(7, 7))).toEqual([4, 6, 8, 10]);
+    // número ímpar de jogadores: 6 e 10 não fecham a conta
+    expect(opcoesJogosPorPessoa(grupo(6, 3))).toEqual([4, 8]);
+    expect(motivoJogosInvalido(9, 6)).toMatch(/9 jogadores/);
+    expect(motivoJogosInvalido(9, 8)).toBeNull();
   });
 });
 

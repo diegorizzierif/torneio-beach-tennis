@@ -9,7 +9,7 @@ create table public.torneios (
   organizador_id   uuid not null default auth.uid() references auth.users(id) on delete cascade,
   nome             text not null check (length(trim(nome)) > 0),
   data             date not null default current_date,
-  jogos_por_pessoa int  not null default 4 check (jogos_por_pessoa between 1 and 8),
+  jogos_por_pessoa int  not null default 4 check (jogos_por_pessoa between 1 and 10),
   games_por_set    int  not null default 6 check (games_por_set in (4, 6)),
   quadras          int  not null default 1 check (quadras in (1, 2)),
   status           text not null default 'inscricoes'

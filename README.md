@@ -2,14 +2,14 @@
 
 App web para organizar torneios de beach tennis com **duplas rotativas** (mistas sempre que possível) e **ranking ao vivo**.
 
-- **Organizador** (com login): cria o torneio, cadastra de 8 a 14 participantes, escolhe jogos por pessoa, set até 4 ou 6 games e 1 ou 2 quadras, gera os jogos e lança os placares.
+- **Organizador** (com login): cria o torneio, cadastra de 8 a 14 participantes, escolhe 4, 6, 8 ou 10 jogos por pessoa, set até 4 ou 6 games e 1 ou 2 quadras, gera os jogos e lança os placares.
 - **Jogadores** (sem login): abrem o link do torneio e veem os jogos e o ranking geral, masculino e feminino, atualizando sozinho.
 
 As regras do sorteio e do ranking estão em [`docs/regras.md`](docs/regras.md).
 
 ## Como colocar no ar
 
-1. **Banco:** no Supabase, abra *SQL Editor*, cole o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e clique em *Run*.
+1. **Banco:** no Supabase, abra *SQL Editor*, cole o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e clique em *Run*. Se o banco já existia, rode só as migrações que faltam (por exemplo [`supabase/migracao-003-jogos-por-pessoa.sql`](supabase/migracao-003-jogos-por-pessoa.sql)).
 2. **Chaves:** em *Project Settings → API*, copie a *Project URL* e a chave *anon public*.
 3. **Vercel:** importe este repositório em [vercel.com/new](https://vercel.com/new) e adicione as variáveis de ambiente:
    - `VITE_SUPABASE_URL` = Project URL
