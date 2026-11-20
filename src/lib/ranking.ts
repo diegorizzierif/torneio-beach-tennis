@@ -93,10 +93,12 @@ export function calcularRanking(
   return out;
 }
 
-/** Placar válido para 1 set até N games com tie-break em N a N (igual à regra do banco). */
-export function placarValido(a: number, b: number, n: number): boolean {
-  if (!Number.isInteger(a) || !Number.isInteger(b) || a < 0 || b < 0) return false;
-  const hi = Math.max(a, b);
-  const lo = Math.min(a, b);
-  return (hi === n && lo <= n - 2) || (hi === n + 1 && (lo === n - 1 || lo === n));
+/**
+ * Placar válido: números inteiros de 0 a 99 e sem empate (precisa ter vencedor).
+ * O organizador lança o placar como foi jogado (ex.: 5x1, 4x2, 6x3).
+ */
+export function placarValido(a: number, b: number): boolean {
+  if (!Number.isInteger(a) || !Number.isInteger(b)) return false;
+  if (a < 0 || b < 0 || a > 99 || b > 99) return false;
+  return a !== b;
 }

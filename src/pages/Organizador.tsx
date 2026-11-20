@@ -43,9 +43,11 @@ function Placar({
   async function salvar() {
     const ga = Number(a);
     const gb = Number(b);
-    if (a === "" || b === "" || !placarValido(ga, gb, n)) {
+    if (a === "" || b === "" || !placarValido(ga, gb)) {
       aoErro(
-        `Placar ${a || "?"} x ${b || "?"} não vale para set até ${n} games (ex.: ${n}x${n - 2}, ${n + 1}x${n - 1}, ${n + 1}x${n}).`,
+        a !== "" && a === b
+          ? `Placar ${a} x ${b} está empatado. Lance o placar com o vencedor.`
+          : `Placar ${a || "?"} x ${b || "?"} não vale. Use números de 0 a 99.`,
       );
       return;
     }

@@ -151,12 +151,13 @@ describe('ranking', () => {
     const r = calcularRanking(ps, jogos, 'M');
     expect(r.map((l) => l.posicao)).toEqual([1, 1]);
   });
-  it('placar válido', () => {
-    expect(placarValido(6, 4, 6)).toBe(true);
-    expect(placarValido(6, 5, 6)).toBe(false);
-    expect(placarValido(7, 6, 6)).toBe(true);
-    expect(placarValido(4, 2, 4)).toBe(true);
-    expect(placarValido(5, 4, 4)).toBe(true);
-    expect(placarValido(4, 3, 4)).toBe(false);
+  it('placar válido: qualquer placar com vencedor', () => {
+    expect(placarValido(5, 1)).toBe(true);
+    expect(placarValido(4, 2)).toBe(true);
+    expect(placarValido(6, 3)).toBe(true);
+    expect(placarValido(1, 5)).toBe(true);
+    expect(placarValido(3, 3)).toBe(false);
+    expect(placarValido(-1, 4)).toBe(false);
+    expect(placarValido(100, 2)).toBe(false);
   });
 });

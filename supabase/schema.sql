@@ -69,24 +69,17 @@ create table public.jogos (
 );
 create index on public.jogos (torneio_id);
 
--- Placar válido para 1 set até N games com tie-break em N a N:
--- vencedor com N e perdedor com até N-2, ou vencedor com N+1 e perdedor com N-1 ou N.
+-- Placar livre (ex.: 5x1, 4x2, 6x3): de 0 a 99 e com vencedor.
 create or replace function public.validar_placar() returns trigger
 language plpgsql as $$
-declare
-  n int;
-  hi int;
-  lo int;
 begin
   new.atualizado_em := now();
   if new.status <> 'finalizado' then
     return new;
   end if;
-  select games_por_set into n from public.torneios where id = new.torneio_id;
-  hi := greatest(new.games_a, new.games_b);
-  lo := least(new.games_a, new.games_b);
-  if not ((hi = n and lo <= n - 2) or (hi = n + 1 and lo in (n - 1, n))) then
-    raise exception 'Placar inválido para set até % games: % x %', n, new.games_a, new.games_b;
+  -- placar livre: de 0 a 99, sem empate
+  if new.games_a > 99 or new.games_b > 99 or new.games_a = new.games_b then
+    raise exception 'Placar inválido: % x % (precisa ter vencedor, de 0 a 99)', new.games_a, new.games_b;
   end if;
   return new;
 end $$;
