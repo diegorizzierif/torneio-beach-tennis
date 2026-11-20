@@ -56,6 +56,7 @@ export function Ranking({ participantes, jogos }: { participantes: Participante[
               <span>#</span>
               <span>Jogador</span>
               <span title="Vitórias">V</span>
+              <span title="Empates">E</span>
               <span title="Jogos">J</span>
               <span title="Saldo de games">SG</span>
             </li>
@@ -67,12 +68,13 @@ export function Ranking({ participantes, jogos }: { participantes: Participante[
                   <span className="nome">{l.nome}</span>
                 </span>
                 <span className="forte">{l.vitorias}</span>
+                <span>{l.empates}</span>
                 <span>{l.jogos}</span>
                 <span className={l.saldo > 0 ? 'pos-saldo' : l.saldo < 0 ? 'neg-saldo' : ''}>{l.saldo > 0 ? `+${l.saldo}` : l.saldo}</span>
               </li>
             ))}
           </ol>
-          <p className="legenda">V vitórias · J jogos · SG saldo de games. Desempate: saldo, games feitos e confronto direto.</p>
+          <p className="legenda">V vitórias · E empates · J jogos · SG saldo de games. Desempate: saldo, games feitos e confronto direto.</p>
         </>
       )}
     </section>
@@ -117,6 +119,8 @@ export function ListaJogos({
             {js.map((j) => {
               const fin = j.status === 'finalizado';
               const venceuA = fin && j.games_a! > j.games_b!;
+              const empate = fin && j.games_a === j.games_b;
+              const classe = (venceu: boolean) => (!fin ? '' : empate ? 'empate' : venceu ? 'venceu' : 'perdeu');
               const ehProximo = !!proximo && proximo.rodada === j.rodada && !fin;
               return (
                 <article key={j.id} className={`jogo ${fin ? 'fin' : ''} ${ehProximo ? 'proximo' : ''}`}>
@@ -129,11 +133,11 @@ export function ListaJogos({
                     {fin && <span className="selo-fin">Encerrado</span>}
                   </div>
                   <div className="confronto">
-                    <div className={`lado ${fin ? (venceuA ? 'venceu' : 'perdeu') : ''}`}>
+                    <div className={`lado ${classe(venceuA)}`}>
                       <span>{nomeDupla([j.a1, j.a2], mapa)}</span>
                       {fin && !renderPlacar && <b>{j.games_a}</b>}
                     </div>
-                    <div className={`lado ${fin ? (!venceuA ? 'venceu' : 'perdeu') : ''}`}>
+                    <div className={`lado ${classe(!venceuA)}`}>
                       <span>{nomeDupla([j.b1, j.b2], mapa)}</span>
                       {fin && !renderPlacar && <b>{j.games_b}</b>}
                     </div>

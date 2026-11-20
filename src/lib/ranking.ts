@@ -21,6 +21,7 @@ export interface LinhaRanking {
   sexo: Sexo;
   jogos: number;
   vitorias: number;
+  empates: number;
   derrotas: number;
   feitos: number;
   sofridos: number;
@@ -38,7 +39,7 @@ export function calcularRanking(
 ): LinhaRanking[] {
   const base = new Map<string, Omit<LinhaRanking, 'posicao'>>();
   for (const p of participantes)
-    base.set(p.id, { id: p.id, nome: p.nome, sexo: p.sexo, jogos: 0, vitorias: 0, derrotas: 0, feitos: 0, sofridos: 0, saldo: 0 });
+    base.set(p.id, { id: p.id, nome: p.nome, sexo: p.sexo, jogos: 0, vitorias: 0, empates: 0, derrotas: 0, feitos: 0, sofridos: 0, saldo: 0 });
   // vitoriasContra["x|y"] = quantas vezes x venceu tendo y como adversário
   const vitoriasContra = new Map<string, number>();
 
@@ -57,9 +58,11 @@ export function calcularRanking(
         l.sofridos += s;
         l.saldo += f - s;
         if (f > s) l.vitorias++;
+        else if (f === s) l.empates++;
         else l.derrotas++;
       }
     }
+    if (j.games_a === j.games_b) continue; // empate não conta no confronto direto
     const [venc, perd] = j.games_a > j.games_b ? [[j.a1, j.a2], [j.b1, j.b2]] : [[j.b1, j.b2], [j.a1, j.a2]];
     for (const x of venc) for (const y of perd) vitoriasContra.set(`${x}|${y}`, (vitoriasContra.get(`${x}|${y}`) ?? 0) + 1);
   }
@@ -94,11 +97,10 @@ export function calcularRanking(
 }
 
 /**
- * Placar válido: números inteiros de 0 a 99 e sem empate (precisa ter vencedor).
+ * Placar válido: números inteiros de 0 a 99. Empate é permitido (ex.: 3x3).
  * O organizador lança o placar como foi jogado (ex.: 5x1, 4x2, 6x3).
  */
 export function placarValido(a: number, b: number): boolean {
   if (!Number.isInteger(a) || !Number.isInteger(b)) return false;
-  if (a < 0 || b < 0 || a > 99 || b > 99) return false;
-  return a !== b;
+  return a >= 0 && b >= 0 && a <= 99 && b <= 99;
 }

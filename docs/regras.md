@@ -68,7 +68,7 @@ Testei de 8 a 14 participantes, com 2 a 7 mulheres: no mínimo de jogos, todo mu
 ## 3. Pontuação e ranking
 
 - **Cada jogo:** 1 set. Ao criar o torneio, o organizador escolhe **até 4 games** (tie-break no 4 a 4) ou **até 6 games** (tie-break no 6 a 6).
-- O organizador lança o placar como foi jogado, **livre** (ex.: 5 x 1, 4 x 2, 6 x 3). Vale qualquer placar de 0 a 99, desde que tenha vencedor (empate não é aceito). O "set até 4 ou 6 games" serve como referência e para estimar a duração. Os dois jogadores da dupla vencedora ganham a vitória e os dois recebem o mesmo saldo.
+- O organizador lança o placar como foi jogado, **livre** (ex.: 5 x 1, 4 x 2, 6 x 3). Vale qualquer placar de 0 a 99, inclusive **empate** (ex.: 3 x 3). No empate ninguém ganha vitória, e o jogo conta como empate (coluna E do ranking). O "set até 4 ou 6 games" serve como referência e para estimar a duração. Os dois jogadores da dupla vencedora ganham a vitória e os dois recebem o mesmo saldo.
 - **Ordem do ranking:**
   1. Número de vitórias
   2. Saldo de games (games feitos menos games sofridos)

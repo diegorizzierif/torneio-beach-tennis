@@ -151,12 +151,17 @@ describe('ranking', () => {
     const r = calcularRanking(ps, jogos, 'M');
     expect(r.map((l) => l.posicao)).toEqual([1, 1]);
   });
-  it('placar válido: qualquer placar com vencedor', () => {
+  it('empate conta como empate, sem vitória nem derrota', () => {
+    const jogos = [{ a1: 'a', a2: 'e', b1: 'b', b2: 'f', games_a: 3, games_b: 3, status: 'finalizado' }];
+    const g = calcularRanking(ps, jogos);
+    for (const l of g) expect(l).toMatchObject({ jogos: 1, vitorias: 0, empates: 1, derrotas: 0, saldo: 0 });
+  });
+  it('placar válido: qualquer placar de 0 a 99, com empate', () => {
     expect(placarValido(5, 1)).toBe(true);
     expect(placarValido(4, 2)).toBe(true);
     expect(placarValido(6, 3)).toBe(true);
     expect(placarValido(1, 5)).toBe(true);
-    expect(placarValido(3, 3)).toBe(false);
+    expect(placarValido(3, 3)).toBe(true);
     expect(placarValido(-1, 4)).toBe(false);
     expect(placarValido(100, 2)).toBe(false);
   });
