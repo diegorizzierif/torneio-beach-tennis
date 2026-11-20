@@ -6,6 +6,7 @@ import { placarValido } from "../lib/ranking";
 import {
   JOGOS_POR_PESSOA,
   motivoJogosInvalido,
+  motivoTodosContraTodos,
   opcoesJogosPorPessoa,
   sortear,
   type Sexo,
@@ -360,7 +361,15 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
 
   const t = torneio;
   const link = `${window.location.origin}/t/${t.codigo}`;
-  const opcoes = opcoesJogosPorPessoa(participantes);
+  const opcoes = opcoesJogosPorPessoa(participantes).filter(
+    (k) => !t.todos_contra_todos || !motivoTodosContraTodos(participantes, k),
+  );
+  const motivoJogos =
+    motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
+    (t.todos_contra_todos
+      ? motivoTodosContraTodos(participantes, t.jogos_por_pessoa)
+      : null) ??
+    "Escolha 4, 6, 8 ou 10 jogos por pessoa.";
   const finalizados = jogos.filter((j) => j.status === "finalizado").length;
   const totalJogos = (participantes.length * t.jogos_por_pessoa) / 4;
   const minutos = (totalJogos * (t.games_por_set === 6 ? 25 : 15)) / t.quadras;
@@ -376,17 +385,15 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
 
   async function gerar() {
     if (!opcoes.includes(t.jogos_por_pessoa))
-      return setMsg(
-        motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
-          "Escolha 4, 6, 8 ou 10 jogos por pessoa.",
-      );
+      return setMsg(motivoJogos);
     setOcupado(true);
     setMsg(null);
     await new Promise((r) => setTimeout(r, 30)); // deixa a tela mostrar "Sorteando…"
     const r = sortear(participantes, {
       jogosPorPessoa: t.jogos_por_pessoa,
       quadras: t.quadras,
-      tempoMs: 1500,
+      tempoMs: t.todos_contra_todos ? 2500 : 1500,
+      todosContraTodos: t.todos_contra_todos,
     });
     if (!r) {
       setOcupado(false);
@@ -415,6 +422,10 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
         .eq("id", t.id);
     setOcupado(false);
     const avisos: string[] = [];
+    if (t.todos_contra_todos && r.naoSeEnfrentaram > 0)
+      avisos.push(
+        `${r.naoSeEnfrentaram} par(es) de jogadores não vão se enfrentar. Use "Refazer sorteio" ou aumente os jogos por pessoa.`,
+      );
     if (r.parceirosRepetidos > 0)
       avisos.push(`${r.parceirosRepetidos} dupla(s) precisaram se repetir.`);
     if (t.quadras === 2) {
@@ -514,11 +525,20 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
                 desativados={JOGOS_POR_PESSOA.filter((k) => !opcoes.includes(k))}
               />
               {!opcoes.includes(t.jogos_por_pessoa) && (
-                <p className="sub">
-                  {motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
-                    "Escolha 4, 6, 8 ou 10 jogos por pessoa."}
-                </p>
+                <p className="sub">{motivoJogos}</p>
               )}
+            </div>
+            <div className="campo">
+              <span>Todo mundo enfrenta todo mundo</span>
+              <Segmentos
+                rotulo="Todo mundo enfrenta todo mundo"
+                valor={t.todos_contra_todos ? "sim" : "nao"}
+                aoMudar={(v) => alterar({ todos_contra_todos: v === "sim" })}
+                opcoes={[
+                  ["nao", "Não"],
+                  ["sim", "Sim"],
+                ]}
+              />
             </div>
             <div className="campo">
               <span>Set até</span>

@@ -43,6 +43,24 @@ Se o organizador não gostar do resultado, pode clicar em "Sortear de novo".
 
 **Com 2 quadras:** testei de 8 a 14 participantes. De 10 pessoas para cima o tempo cai quase pela metade, porque os dois jogos acontecem juntos. Com 8 pessoas, todos jogam em toda rodada e ninguém descansa. Com número ímpar de mulheres e poucos jogadores (por exemplo, 5 homens e 3 mulheres), muitas vezes só dá para formar um jogo misto por vez, e a segunda quadra fica parada. Nesses casos o app avisa e sugere usar 1 quadra.
 
+**Todo mundo enfrenta todo mundo (opcional):** ao criar o torneio, o organizador pode ligar esta opção. O sorteio então coloca como prioridade máxima que cada jogador enfrente cada outro pelo menos uma vez, sem quebrar a regra das duplas (dupla masculina só joga contra dupla masculina, mista contra mista, feminina contra feminina). Para isso é preciso um mínimo de jogos por pessoa, e o app risca as opções que não bastam:
+
+- cada jogo coloca a pessoa contra 2 adversários, então são pelo menos (participantes − 1) ÷ 2 jogos;
+- uma mulher só enfrenta homens em jogo misto, e cada misto tem só 1 homem do outro lado. Então ela precisa de pelo menos um jogo por homem. O mesmo vale para os homens em relação às mulheres.
+
+| Grupo | Mínimo de jogos por pessoa |
+|---|---|
+| 8 (4 H + 4 M) | 4 |
+| 8 (5 H + 3 M) | 6 |
+| 9 (5 H + 4 M) | 8 |
+| 10 (5 H + 5 M) | 6 |
+| 10 (6 H + 4 M) | 6 |
+| 12 (6 H + 6 M) | 6 |
+| 12 (8 H + 4 M) | 8 |
+| 14 (7 H + 7 M) | 8 |
+
+Testei de 8 a 14 participantes, com 2 a 7 mulheres: no mínimo de jogos, todo mundo enfrentou todo mundo em todos os casos. O custo é que, com o mínimo de jogos, às vezes alguém repete parceiro. Se o sorteio não conseguir que todos se enfrentem, o app avisa quantos pares ficaram de fora.
+
 **Caso especial, só 1 mulher (ou 1 homem):** não há como formar mista x mista. Nesse caso o app avisa, e o organizador escolhe entre deixar essa pessoa jogar em dupla mista contra dupla masculina ou montar o torneio todo sem a regra de mistas.
 
 ## 3. Pontuação e ranking

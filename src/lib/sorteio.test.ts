@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { motivoJogosInvalido, opcoesJogosPorPessoa, sortear, type Jogador } from './sorteio';
+import { minimoTodosContraTodos, motivoJogosInvalido, opcoesJogosPorPessoa, sortear, type Jogador } from './sorteio';
 import { calcularRanking, placarValido } from './ranking';
 
 function grupo(homens: number, mulheres: number): Jogador[] {
@@ -71,6 +71,33 @@ describe('sorteio', () => {
     expect(motivoJogosInvalido(9, 6)).toMatch(/9 jogadores/);
     expect(motivoJogosInvalido(9, 8)).toBeNull();
   });
+});
+
+describe('todos contra todos', () => {
+  it('mínimo de jogos por pessoa', () => {
+    expect(minimoTodosContraTodos(grupo(4, 4))).toBe(4);
+    expect(minimoTodosContraTodos(grupo(5, 4))).toBe(5); // 9 jogadores: na prática 8 jogos
+    expect(minimoTodosContraTodos(grupo(6, 6))).toBe(6);
+    expect(minimoTodosContraTodos(grupo(10, 2))).toBe(10);
+  });
+
+  it('com jogos suficientes, todo mundo enfrenta todo mundo (8 a 14 jogadores)', () => {
+    for (let n = 8; n <= 14; n++)
+      for (let w = 2; w <= n / 2; w++) {
+        const js = grupo(n - w, w);
+        const k = opcoesJogosPorPessoa(js).find((x) => x >= minimoTodosContraTodos(js));
+        if (!k) continue;
+        const r = sortear(js, { jogosPorPessoa: k, quadras: 1, semente: 42, tempoMs: 1000, todosContraTodos: true });
+        expect(r, `${n - w}H+${w}M, ${k} jogos`).not.toBeNull();
+        expect(r!.naoSeEnfrentaram, `${n - w}H+${w}M, ${k} jogos`).toBe(0);
+        // dupla masculina só enfrenta dupla masculina
+        const sexo = new Map(js.map((j) => [j.id, j.sexo]));
+        for (const j of r!.jogos) {
+          const t = (p: string[]) => p.map((x) => sexo.get(x)).sort().join('');
+          expect(t(j.a)).toBe(t(j.b));
+        }
+      }
+  }, 120_000);
 });
 
 describe('ranking', () => {

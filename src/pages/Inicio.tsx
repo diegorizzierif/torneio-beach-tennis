@@ -2,7 +2,11 @@ import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { supabase, type Torneio } from "../lib/supabase";
-import { JOGOS_POR_PESSOA, motivoJogosInvalido } from "../lib/sorteio";
+import {
+  JOGOS_POR_PESSOA,
+  motivoJogosInvalido,
+  motivoTodosContraTodos,
+} from "../lib/sorteio";
 import { dataBR, Icone, Moldura, Segmentos } from "../ui";
 import { useJogadores } from "./Jogadores";
 
@@ -137,6 +141,7 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
   const [busca, setBusca] = useState("");
   const [jogosPorPessoa, setJogosPorPessoa] = useState<number>(4);
   const [gamesPorSet, setGamesPorSet] = useState<4 | 6>(6);
+  const [todosContraTodos, setTodosContraTodos] = useState(false);
   const { jogadores } = useJogadores(sessao.user.id);
   const navegar = useNavigate();
 
@@ -150,6 +155,13 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
   }
   const escolhidos = (jogadores ?? []).filter((j) => marcados.has(j.id));
   const hm = escolhidos.filter((j) => j.sexo === "M").length;
+  const avisoJogos =
+    escolhidos.length >= 4
+      ? (motivoJogosInvalido(escolhidos.length, jogosPorPessoa) ??
+        (todosContraTodos
+          ? motivoTodosContraTodos(escolhidos, jogosPorPessoa)
+          : null))
+      : null;
   const visiveis = (jogadores ?? []).filter((j) =>
     j.nome.toLowerCase().includes(busca.trim().toLowerCase()),
   );
@@ -175,6 +187,7 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
         nome: nome.trim(),
         jogos_por_pessoa: jogosPorPessoa,
         games_por_set: gamesPorSet,
+        todos_contra_todos: todosContraTodos,
       })
       .select()
       .single();
@@ -219,13 +232,23 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
             aoMudar={setJogosPorPessoa}
             opcoes={JOGOS_POR_PESSOA.map((k) => [k, String(k)] as const)}
           />
-          {escolhidos.length >= 4 &&
-            motivoJogosInvalido(escolhidos.length, jogosPorPessoa) && (
-              <p className="sub">
-                {motivoJogosInvalido(escolhidos.length, jogosPorPessoa)} Dá
-                para ajustar depois, antes do sorteio.
-              </p>
-            )}
+          {avisoJogos && (
+            <p className="sub">
+              {avisoJogos} Dá para ajustar depois, antes do sorteio.
+            </p>
+          )}
+        </div>
+        <div className="campo">
+          <span>Todo mundo enfrenta todo mundo</span>
+          <Segmentos
+            rotulo="Todo mundo enfrenta todo mundo"
+            valor={todosContraTodos ? "sim" : "nao"}
+            aoMudar={(v) => setTodosContraTodos(v === "sim")}
+            opcoes={[
+              ["nao", "Não"],
+              ["sim", "Sim"],
+            ]}
+          />
         </div>
         <div className="campo">
           <span>Set até</span>
