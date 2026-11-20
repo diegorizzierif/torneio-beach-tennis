@@ -21,22 +21,28 @@ export interface ResultadoSorteio {
 }
 
 /** Quantidades de jogos por pessoa que o organizador pode escolher. */
-export const JOGOS_POR_PESSOA = [4, 6, 8, 10] as const;
+export const JOGOS_POR_PESSOA = [4, 6, 7, 8, 10] as const;
 
 /**
  * Motivo para uma quantidade de jogos por pessoa não fechar a conta neste grupo,
  * ou null se ela funciona.
  */
-export function motivoJogosInvalido(n: number, k: number): string | null {
+export function motivoJogosInvalido(n: number, k: number, mulheres?: number): string | null {
   if (n < 4) return 'Inclua pelo menos 4 jogadores.';
   if ((n * k) % 4 !== 0)
-    return `Com ${n} jogadores, ${k} jogos por pessoa não fecham a conta (o total de vagas precisa dividir por 4). Use 4 ou 8, ou inclua/retire um jogador.`;
+    return `Com ${n} jogadores, ${k} jogos por pessoa não fecham a conta (o total de vagas precisa dividir por 4).`;
+  // Todo jogo tem 0, 2 ou 4 pessoas de cada sexo, então as vagas de cada sexo precisam ser pares.
+  if (mulheres !== undefined && Math.min(mulheres, n - mulheres) > 1 && k % 2 === 1) {
+    if ((mulheres * k) % 2 !== 0 || ((n - mulheres) * k) % 2 !== 0)
+      return `Com número ímpar de homens ou de mulheres, ${k} jogos por pessoa não fecham a conta das duplas mistas.`;
+  }
   return null;
 }
 
-/** Quantidades de jogos por pessoa (entre 4, 6, 8 e 10) que fecham a conta para esse grupo. */
+/** Quantidades de jogos por pessoa (4, 6, 7, 8 ou 10) que fecham a conta para esse grupo. */
 export function opcoesJogosPorPessoa(jogadores: Jogador[]): number[] {
-  return JOGOS_POR_PESSOA.filter((k) => motivoJogosInvalido(jogadores.length, k) === null);
+  const w = jogadores.filter((j) => j.sexo === 'F').length;
+  return JOGOS_POR_PESSOA.filter((k) => motivoJogosInvalido(jogadores.length, k, w) === null);
 }
 
 /**

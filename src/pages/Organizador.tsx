@@ -365,11 +365,11 @@ function TelaOrganizador({ sessao }: { sessao: Session }) {
     (k) => !t.todos_contra_todos || !motivoTodosContraTodos(participantes, k),
   );
   const motivoJogos =
-    motivoJogosInvalido(participantes.length, t.jogos_por_pessoa) ??
+    motivoJogosInvalido(participantes.length, t.jogos_por_pessoa, participantes.filter((j) => j.sexo === "F").length) ??
     (t.todos_contra_todos
       ? motivoTodosContraTodos(participantes, t.jogos_por_pessoa)
       : null) ??
-    "Escolha 4, 6, 8 ou 10 jogos por pessoa.";
+    "Escolha 4, 6, 7, 8 ou 10 jogos por pessoa.";
   const finalizados = jogos.filter((j) => j.status === "finalizado").length;
   const totalJogos = (participantes.length * t.jogos_por_pessoa) / 4;
   const minutos = (totalJogos * (t.games_por_set === 6 ? 25 : 15)) / t.quadras;
