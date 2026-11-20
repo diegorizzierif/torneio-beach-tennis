@@ -8,7 +8,7 @@ Versão 3, 13/11/2026 (com as respostas do Diego). Este documento define como o 
 - **Mistas sempre que possível:** uma dupla mista só enfrenta outra dupla mista.
 - **Sobrando homens (ou mulheres):** os excedentes formam duplas do mesmo sexo, que só enfrentam duplas do mesmo tipo. Ou seja, nunca acontece um jogo de dupla masculina contra dupla mista, e as mulheres não ficam em desvantagem.
 - **De 8 a 14 participantes.**
-- **Todos jogam o mesmo número de jogos**, escolhido pelo organizador entre as opções da tabela abaixo (padrão: 4). Assim o ranking é justo.
+- **Todos jogam o mesmo número de jogos**, escolhido pelo organizador ao criar o torneio: **4, 6, 8 ou 10** (padrão: 4). Assim o ranking é justo.
 - **1 ou 2 quadras**, escolhido ao criar o torneio. Com 1 quadra, os jogos ficam numa fila numerada. Com 2 quadras, o app monta rodadas com dois jogos ao mesmo tempo, sem ninguém escalado nas duas quadras.
 
 ## 2. Como o sorteio monta os jogos
@@ -23,21 +23,21 @@ Quando o organizador clica em "Gerar jogos", o app testa milhares de combinaçõ
 
 Se o organizador não gostar do resultado, pode clicar em "Sortear de novo".
 
-**Quantidade de jogos:** total de jogos = participantes × jogos por pessoa ÷ 4. A conta precisa dar um número inteiro, então as opções mudam conforme o número de pessoas. O app só mostra as opções que funcionam:
+**Quantidade de jogos:** total de jogos = participantes × jogos por pessoa ÷ 4. A conta precisa dar um número inteiro. Com 4 ou 8 jogos por pessoa sempre fecha. Com 6 ou 10, o número de participantes precisa ser par; com número ímpar, o app mostra essas opções riscadas e explica o motivo.
 
-| Participantes | Jogos por pessoa (opções) | Total de jogos na quadra |
-|---|---|---|
-| 8 | 2, 3, 4, 5, 6 | 4, 6, 8, 10, 12 |
-| 9 | 4 | 9 |
-| 10 | 2, 4, 6 | 5, 10, 15 |
-| 11 | 4 | 11 |
-| 12 | 2, 3, 4, 5, 6 | 6, 9, 12, 15, 18 |
-| 13 | 4 | 13 |
-| 14 | 2, 4 | 7, 14 |
+| Participantes | 4 jogos | 6 jogos | 8 jogos | 10 jogos |
+|---|---|---|---|---|
+| 8 | 8 | 12 | 16 | 20 |
+| 9 | 9 | não fecha | 18 | não fecha |
+| 10 | 10 | 15 | 20 | 25 |
+| 11 | 11 | não fecha | 22 | não fecha |
+| 12 | 12 | 18 | 24 | 30 |
+| 13 | 13 | não fecha | 26 | não fecha |
+| 14 | 14 | 21 | 28 | 35 |
 
-Com número ímpar de mulheres (3 ou 5, por exemplo), só valem os números pares de jogos por pessoa, porque toda mulher joga em dupla mista contra outra mista. O app esconde as opções ímpares nesses casos.
+(total de jogos na quadra)
 
-**Testes feitos:** rodei o sorteio para todas as combinações de 8 a 14 participantes, com 2 a 7 mulheres. Em todas as opções da tabela, ninguém repetiu parceiro e ninguém jogou mais de 2 jogos seguidos. A única exceção é quando sobram jogos demais para poucas mulheres, como 8 jogos por pessoa com 2 mulheres. Por isso o máximo ficou em 6.
+**Parceiros repetidos:** com 8 ou 10 jogos por pessoa e poucos participantes, nem sempre dá para jogar com um parceiro diferente em todo jogo. Com 8 pessoas, por exemplo, cada um tem só 7 parceiros possíveis (e menos ainda com a regra das mistas), então em 8 ou 10 jogos alguém vai repetir. O sorteio repete o mínimo possível e o app avisa quantas duplas se repetiram.
 
 **Tempo:** numa quadra só, 14 jogos com set até 6 games passam de 5 horas. Para 12 a 14 pessoas, vale usar sets até 4 games ou 2 quadras.
 
@@ -103,7 +103,7 @@ Rodei o sorteio no computador com três combinações. Em todas, **ninguém repe
 
 ## 5. Decisões confirmadas pelo Diego (13/11)
 
-1. **Jogos por pessoa:** 4 como padrão, com as outras opções da tabela disponíveis.
+1. **Jogos por pessoa:** 4, 6, 8 ou 10, escolhido ao criar o torneio (padrão 4). Atualizado em 20/11.
 2. **Set:** até 4 ou até 6 games, escolhido na hora de criar o torneio.
 3. **Ranking:** vitórias, depois saldo de games, depois games feitos.
 4. **Rankings:** geral, masculino e feminino.

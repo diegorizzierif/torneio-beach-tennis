@@ -118,16 +118,19 @@ export function Segmentos<T extends string | number>({
   opcoes,
   aoMudar,
   rotulo,
+  desativados = [],
 }: {
   valor: T;
   opcoes: readonly (readonly [T, ReactNode])[];
   aoMudar: (v: T) => void;
   rotulo: string;
+  /** Opções que aparecem mas não podem ser escolhidas. */
+  desativados?: readonly T[];
 }) {
   return (
     <div className="segmentos" role="radiogroup" aria-label={rotulo}>
       {opcoes.map(([v, r]) => (
-        <button key={String(v)} type="button" role="radio" aria-checked={valor === v} className={valor === v ? 'ativo' : ''} onClick={() => aoMudar(v)}>
+        <button key={String(v)} type="button" role="radio" aria-checked={valor === v} className={valor === v ? 'ativo' : ''} disabled={desativados.includes(v)} onClick={() => aoMudar(v)}>
           {r}
         </button>
       ))}

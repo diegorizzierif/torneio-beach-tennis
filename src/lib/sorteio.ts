@@ -18,23 +18,23 @@ export interface ResultadoSorteio {
   maxSeguidos: number;
 }
 
-/** Quantidade de jogos por pessoa que fecham a conta para esse grupo. */
-export function opcoesJogosPorPessoa(jogadores: Jogador[], max = 6): number[] {
-  const n = jogadores.length;
-  if (n < 4) return [];
-  const w = jogadores.filter((j) => j.sexo === 'F').length;
-  const minoria = Math.min(w, n - w);
-  const out: number[] = [];
-  for (let k = 2; k <= max; k++) {
-    if ((n * k) % 4 !== 0) continue;
-    // Se o sexo em menor número é ímpar (e maior que 1), todos dele jogam
-    // só em mista x mista, então o total de vagas dele (minoria × k) precisa ser par.
-    if (minoria > 1 && minoria % 2 === 1 && k % 2 === 1) continue;
-    // Total de jogos grande demais para uma tarde.
-    if ((n * k) / 4 > 21) continue;
-    out.push(k);
-  }
-  return out;
+/** Quantidades de jogos por pessoa que o organizador pode escolher. */
+export const JOGOS_POR_PESSOA = [4, 6, 8, 10] as const;
+
+/**
+ * Motivo para uma quantidade de jogos por pessoa não fechar a conta neste grupo,
+ * ou null se ela funciona.
+ */
+export function motivoJogosInvalido(n: number, k: number): string | null {
+  if (n < 4) return 'Inclua pelo menos 4 jogadores.';
+  if ((n * k) % 4 !== 0)
+    return `Com ${n} jogadores, ${k} jogos por pessoa não fecham a conta (o total de vagas precisa dividir por 4). Use 4 ou 8, ou inclua/retire um jogador.`;
+  return null;
+}
+
+/** Quantidades de jogos por pessoa (entre 4, 6, 8 e 10) que fecham a conta para esse grupo. */
+export function opcoesJogosPorPessoa(jogadores: Jogador[]): number[] {
+  return JOGOS_POR_PESSOA.filter((k) => motivoJogosInvalido(jogadores.length, k) === null);
 }
 
 /** Gerador pseudoaleatório com semente (mulberry32), para o sorteio ser reproduzível. */
@@ -111,10 +111,34 @@ export function sortear(jogadores: Jogador[], op: OpcoesSorteio): ResultadoSorte
       usadas = 0;
     };
 
+    // Mede o quanto a escolha deixa o resto da tabela impossível de fechar.
+    const qtd = { M: n - w, F: w };
+    const desequilibrio = (jogam: string[]) => {
+      const soma = { M: 0, F: 0 };
+      const maior = { M: 0, F: 0 };
+      for (const id of ids) {
+        const sx = sexo.get(id)!;
+        const r = restam.get(id)! - (jogam.includes(id) ? 1 : 0);
+        soma[sx] += r;
+        if (r > maior[sx]) maior[sx] = r;
+      }
+      let ruim = 0;
+      for (const sx of ['M', 'F'] as const) {
+        // Todo jogo tem pelo menos duas pessoas de cada sexo presente, então
+        // ninguém pode ter mais jogos sobrando do que a soma dos outros do mesmo sexo.
+        ruim += Math.max(0, 2 * maior[sx] - soma[sx]);
+        // Com menos de 4 pessoas de um sexo não existe dupla x dupla do mesmo sexo:
+        // cada vaga delas precisa de uma vaga do outro sexo num jogo misto.
+        const outro = sx === 'M' ? 'F' : 'M';
+        if (qtd[sx] < 4) ruim += Math.max(0, soma[sx] - soma[outro]);
+      }
+      return ruim;
+    };
+
     for (let m = 0; m < N && ok; m++) {
       for (let tentativa = 0; tentativa < 2; tentativa++) {
         const disp = ids.filter((id) => restam.get(id)! > 0 && !naRodada.has(id));
-        let best: { s: number; p1: [string, string]; p2: [string, string] } | null = null;
+        let best: { s: number; trava: number; p1: [string, string]; p2: [string, string] } | null = null;
         combinacoes4(disp, (a, b, c, d) => {
           const splits: [[string, string], [string, string]][] = [
             [[a, b], [c, d]],
@@ -129,11 +153,17 @@ export function sortear(jogadores: Jogador[], op: OpcoesSorteio): ResultadoSorte
               if (seguidos.get(x)! >= 2) s += 20;
               s -= 2 * restam.get(x)!;
             }
+            // Ninguém pode ficar com mais jogos sobrando do que a soma dos outros do
+            // mesmo sexo: todo jogo tem pelo menos duas pessoas de cada sexo presente.
+            const trava = relaxado ? 0 : desequilibrio([a, b, c, d]);
+            s += 1000 * trava;
             s += rand() * 4;
-            if (!best || s < best.s) best = { s, p1, p2 };
+            if (!best || s < best.s) best = { s, trava, p1, p2 };
           }
         });
-        if (!best) {
+        // Se o único jogo possível nesta rodada travaria o resto da tabela,
+        // deixa a outra quadra vazia e começa uma rodada nova.
+        if (!best || ((best as { trava: number }).trava > 0 && naRodada.size > 0)) {
           if (naRodada.size > 0) {
             fecharRodada();
             continue;
