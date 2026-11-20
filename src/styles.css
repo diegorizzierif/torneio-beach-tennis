@@ -273,7 +273,7 @@ input:focus { outline: none; border-color: var(--mar); background: var(--card); 
 .p1 .avatar { box-shadow: 0 0 0 3px var(--ouro); }
 
 .tabela-ranking { list-style: none; margin: 0; padding: 0; background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); overflow: hidden; font-variant-numeric: tabular-nums; }
-.tabela-ranking li { display: grid; grid-template-columns: 34px 1fr 34px 30px 40px; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: center; }
+.tabela-ranking li { display: grid; grid-template-columns: 30px 1fr 30px 26px 26px 40px; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: center; }
 .tabela-ranking li:last-child { border-bottom: none; }
 .tabela-ranking li.cab { font-size: 0.72rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px 8px; background: var(--card-2); }
 .tabela-ranking li.cab span:nth-child(2) { text-align: left; }

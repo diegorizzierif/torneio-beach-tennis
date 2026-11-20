@@ -69,7 +69,7 @@ create table public.jogos (
 );
 create index on public.jogos (torneio_id);
 
--- Placar livre (ex.: 5x1, 4x2, 6x3): de 0 a 99 e com vencedor.
+-- Placar livre (ex.: 5x1, 4x2, 3x3): de 0 a 99, empate permitido.
 create or replace function public.validar_placar() returns trigger
 language plpgsql as $$
 begin
@@ -77,9 +77,9 @@ begin
   if new.status <> 'finalizado' then
     return new;
   end if;
-  -- placar livre: de 0 a 99, sem empate
-  if new.games_a > 99 or new.games_b > 99 or new.games_a = new.games_b then
-    raise exception 'Placar inválido: % x % (precisa ter vencedor, de 0 a 99)', new.games_a, new.games_b;
+  -- placar livre: de 0 a 99, empate permitido
+  if new.games_a > 99 or new.games_b > 99 then
+    raise exception 'Placar inválido: % x % (use números de 0 a 99)', new.games_a, new.games_b;
   end if;
   return new;
 end $$;

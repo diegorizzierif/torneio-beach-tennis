@@ -45,9 +45,7 @@ function Placar({
     const gb = Number(b);
     if (a === "" || b === "" || !placarValido(ga, gb)) {
       aoErro(
-        a !== "" && a === b
-          ? `Placar ${a} x ${b} está empatado. Lance o placar com o vencedor.`
-          : `Placar ${a || "?"} x ${b || "?"} não vale. Use números de 0 a 99.`,
+        `Placar ${a || "?"} x ${b || "?"} não vale. Use números de 0 a 99.`,
       );
       return;
     }
