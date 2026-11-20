@@ -157,7 +157,7 @@ function ListaTorneios({ sessao }: { sessao: Session }) {
   const hm = escolhidos.filter((j) => j.sexo === "M").length;
   const avisoJogos =
     escolhidos.length >= 4
-      ? (motivoJogosInvalido(escolhidos.length, jogosPorPessoa) ??
+      ? (motivoJogosInvalido(escolhidos.length, jogosPorPessoa, escolhidos.filter((j) => j.sexo === "F").length) ??
         (todosContraTodos
           ? motivoTodosContraTodos(escolhidos, jogosPorPessoa)
           : null))

@@ -62,14 +62,38 @@ describe('sorteio', () => {
       }
   }, 120_000);
 
-  it('opções de jogos por pessoa: 4, 6, 8 e 10', () => {
-    expect(opcoesJogosPorPessoa(grupo(4, 4))).toEqual([4, 6, 8, 10]);
+  it('opções de jogos por pessoa: 4, 6, 7, 8 e 10', () => {
+    expect(opcoesJogosPorPessoa(grupo(4, 4))).toEqual([4, 6, 7, 8, 10]);
+    expect(opcoesJogosPorPessoa(grupo(6, 6))).toEqual([4, 6, 7, 8, 10]);
+    // 7 jogos com 3 mulheres: vagas femininas ímpares, não fecha
+    expect(motivoJogosInvalido(8, 7, 3)).toMatch(/ímpar/);
     expect(opcoesJogosPorPessoa(grupo(5, 3))).toEqual([4, 6, 8, 10]);
     expect(opcoesJogosPorPessoa(grupo(7, 7))).toEqual([4, 6, 8, 10]);
     // número ímpar de jogadores: 6 e 10 não fecham a conta
     expect(opcoesJogosPorPessoa(grupo(6, 3))).toEqual([4, 8]);
     expect(motivoJogosInvalido(9, 6)).toMatch(/9 jogadores/);
     expect(motivoJogosInvalido(9, 8)).toBeNull();
+  });
+});
+
+describe('8 jogadores (4H+4M), 7 jogos, 2 quadras', () => {
+  it('todo mundo joga com todo mundo, 7 rodadas sem descanso', () => {
+    const js = grupo(4, 4);
+    const sexo = new Map(js.map((j) => [j.id, j.sexo]));
+    for (const semente of [1, 2, 3]) {
+      const r = sortear(js, { jogosPorPessoa: 7, quadras: 2, semente, tempoMs: 800 })!;
+      expect(r.jogos).toHaveLength(14);
+      expect(r.parceirosRepetidos).toBe(0);
+      // 28 parcerias possíveis, cada uma exatamente uma vez
+      const pares = new Set(r.jogos.flatMap((j) => [j.a, j.b]).map((p) => [...p].sort().join('|')));
+      expect(pares.size).toBe(28);
+      const rodadas = new Map<number, string[]>();
+      for (const j of r.jogos) rodadas.set(j.rodada, [...(rodadas.get(j.rodada) ?? []), [...j.a].map((x) => sexo.get(x)).sort().join('')]);
+      expect(rodadas.size).toBe(7);
+      const tipos = [...rodadas.values()].map((t) => t.sort().join(' + '));
+      expect(tipos.filter((t) => t === 'FF + MM')).toHaveLength(3);
+      expect(tipos.filter((t) => t === 'FM + FM')).toHaveLength(4);
+    }
   });
 });
 

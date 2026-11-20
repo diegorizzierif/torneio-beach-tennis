@@ -8,7 +8,7 @@ Versão 3, 13/11/2026 (com as respostas do Diego). Este documento define como o 
 - **Mistas sempre que possível:** uma dupla mista só enfrenta outra dupla mista.
 - **Sobrando homens (ou mulheres):** os excedentes formam duplas do mesmo sexo, que só enfrentam duplas do mesmo tipo. Ou seja, nunca acontece um jogo de dupla masculina contra dupla mista, e as mulheres não ficam em desvantagem.
 - **De 8 a 14 participantes.**
-- **Todos jogam o mesmo número de jogos**, escolhido pelo organizador ao criar o torneio: **4, 6, 8 ou 10** (padrão: 4). Assim o ranking é justo.
+- **Todos jogam o mesmo número de jogos**, escolhido pelo organizador ao criar o torneio: **4, 6, 7, 8 ou 10** (padrão: 4). Assim o ranking é justo.
 - **1 ou 2 quadras**, escolhido ao criar o torneio. Com 1 quadra, os jogos ficam numa fila numerada. Com 2 quadras, o app monta rodadas com dois jogos ao mesmo tempo, sem ninguém escalado nas duas quadras.
 
 ## 2. Como o sorteio monta os jogos
@@ -36,6 +36,8 @@ Se o organizador não gostar do resultado, pode clicar em "Sortear de novo".
 | 14 | 14 | 21 | 28 | 35 |
 
 (total de jogos na quadra)
+
+**7 jogos por pessoa:** só fecha a conta quando o número de participantes é múltiplo de 4 (8 ou 12) e há número par de homens e de mulheres. O caso típico é **8 jogadores (4 H + 4 M) com 7 jogos**: cada um joga exatamente uma vez com cada outro jogador como parceiro. São 14 jogos. Com 2 quadras, ficam 7 rodadas sem ninguém descansar: 3 rodadas de dupla masculina x masculina numa quadra e feminina x feminina na outra, e 4 rodadas de mista x mista nas duas quadras.
 
 **Parceiros repetidos:** com 8 ou 10 jogos por pessoa e poucos participantes, nem sempre dá para jogar com um parceiro diferente em todo jogo. Com 8 pessoas, por exemplo, cada um tem só 7 parceiros possíveis (e menos ainda com a regra das mistas), então em 8 ou 10 jogos alguém vai repetir. O sorteio repete o mínimo possível e o app avisa quantas duplas se repetiram.
 
@@ -121,7 +123,7 @@ Rodei o sorteio no computador com três combinações. Em todas, **ninguém repe
 
 ## 5. Decisões confirmadas pelo Diego (13/11)
 
-1. **Jogos por pessoa:** 4, 6, 8 ou 10, escolhido ao criar o torneio (padrão 4). Atualizado em 20/11.
+1. **Jogos por pessoa:** 4, 6, 7, 8 ou 10, escolhido ao criar o torneio (padrão 4). Atualizado em 20/11.
 2. **Set:** até 4 ou até 6 games, escolhido na hora de criar o torneio.
 3. **Ranking:** vitórias, depois saldo de games, depois games feitos.
 4. **Rankings:** geral, masculino e feminino.
